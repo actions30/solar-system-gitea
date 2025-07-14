@@ -1,17 +1,19 @@
-pipeline{
-  agent any
-    tool name: 'Node 24.4.0', type: 'nodejs'
+pipeline {
+    agent any
 
-  stages{
-    stage('VM NOde version') {
-      steps{
-        sh '''
-            node -v
-            npm -v
-        '''
-         }
-      }
-   }
+    tools {
+        nodejs 'Node 24.4.0'
+    }
+
+    stages {
+        stage('VM Node version') {
+            steps {
+                sh '''
+                    node -v
+                    npm -v
+                '''
+            }
+        }
+    }
 }
-
 
