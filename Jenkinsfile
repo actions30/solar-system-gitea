@@ -11,13 +11,31 @@ pipeline {
                 sh ' npm install --no-audit'
             }
         }
-        stage('NPM Dependency Audit'){
-          steps{
-            sh '''
-               npm audit --audit-level=critical
-               echo $?
-               '''
-           }
+
+        stage('Dependency scanning'){
+          paralell {
+                stage('NPM Dependency Audit'){
+                  steps{
+                    sh '''
+                      npm audit --audit-level=critical
+                      echo $?
+                      '''
+                  }
+                }
+                stage('OWASP Dependency Check'){
+                  steps{
+                    dependencyCheck additionalArguments: '''
+                    --scan \'./\'
+                    --out \'./\'
+                    --format \'ALL\'
+                    --prettyPrint ''', odcInstallation: 'OWSAP-DepCheck-10'
+                    dependencyCheckPublisher failedTotalCritical: 1, pattern: 'dependency-check-report.xml', stopBuild: true
+
+          
+                }
+
+                }
+          }
         }    
     }
 } 
