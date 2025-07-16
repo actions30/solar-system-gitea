@@ -33,9 +33,9 @@ pipeline {
                             --prettyPrint
                         ''', odcInstallation: 'OWASP-depend-check-12'
                             dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
-
-                           publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
-
+                            junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
+                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
+                           
               
                     }
                 }
