@@ -66,7 +66,7 @@ pipeline {
          
 }
 
-        stage('Code coverage') {
+        stage('SonarQube') {
             steps {
                 sh 'echo $SONAR_SCANNER_HOME '
                 sh'''
