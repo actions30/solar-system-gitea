@@ -17,16 +17,16 @@ pipeline {
             }
         }
 
-//         stage('Dependency Scanning') {
-//             parallel {
-//                 stage('NPM Dependency Audit') {
-//                     steps {
-//                         sh '''
-//                             npm audit --audit-level=critical || true
-//                             echo "NPM Audit completed"
-//                         '''
-//                     }
-//                 }
+        stage('Dependency Scanning') {
+            parallel {
+                stage('NPM Dependency Audit') {
+                    steps {
+                        sh '''
+                            npm audit --audit-level=critical || true
+                            echo "NPM Audit completed"
+                        '''
+                    }
+                }
 
 //                 stage('OWASP Dependency Check') {
 //                     steps {
