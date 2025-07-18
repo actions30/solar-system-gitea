@@ -74,6 +74,7 @@ pipeline {
                 -Dsonar.projectKey=jenkins-pipeline \
                 -Dsonar.sources=. \
                 -Dsonar.host.url=http://172.183.97.211:9000 \
+                -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
                 -Dsonar.token=sqp_f16a88e410e8ffd60c881349728c80b02742ffe0
                 '''
 
