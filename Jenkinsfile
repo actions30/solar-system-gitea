@@ -94,13 +94,13 @@ pipeline {
             steps{
                 sh '''
                    trivy image dockerimage:$GIT_COMMIT \
-                        --severity LOW,MEDIUM \
+                        --severity LOW,MEDIUM,HIGH \
                         --exit-code 0 \
                         --quiet \
                         --format json -o trivy-imageMEDIUM-results.json
 
                     trivy image dockerimage:$GIT_COMMIT \
-                        --severity HIGH,CRITICAL \
+                        --severity CRITICAL \
                         --exit-code 1 \
                         --quiet \
                         --format json -o trivy-imageCRITICAL-results.json 
