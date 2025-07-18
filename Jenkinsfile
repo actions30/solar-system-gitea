@@ -1,21 +1,21 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Node 24.4.0'
-    }
+    // tools {
+    //     nodejs 'Node 24.4.0'
+    // }
 
-    environment{
-          SONAR_SCANNER_HOME = tool 'SonarScanner';
-    }
+    // environment{
+    //       SONAR_SCANNER_HOME = tool 'SonarScanner';
+    // }
 
     stages {
 
-        stage('Installing Dependencies') {
-            steps {
-                sh 'npm install --no-audit'
-            }
-        }
+        // stage('Installing Dependencies') {
+        //     steps {
+        //         sh 'npm install --no-audit'
+        //     }
+        // }
 
         // stage('Dependency Scanning') {
         //     parallel {
@@ -89,6 +89,39 @@ pipeline {
             }
 
         }
+
+        stage('Trivy Vulnerability Scanner Docker image'){
+            steps{
+                sh '''
+                   trivy image dockerimage:$GIT_COMMIT \
+                        --severity LOW,MEDIUM \
+                        --exit-code 0 \
+                        --quiet \
+                        --format json -o trivy-imageMEDIUM-results.json
+
+                    trivy image dockerimage:$GIT_COMMIT \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 1 \
+                        --quiet \
+                        --format json -o trivy-imageCRITICAL-results.json 
+                    '''       
+            }
+
+            post{
+                always{
+                    sh '''
+                    trivy convert \
+                    --format template --template "@/usr/local/share/trivy/templates/html.tpl" \
+                    --format trivy-imageMEDIUM-results.html trivy-imageMEDIUM-results.json
+                    '''
+
+                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'trivy-imageMEDIUM-results.html', reportName: 'trivy-imageMEDIUM-results.htmlreport', reportTitles: 'trivy-imageMEDIUM-results.html', useWrapperFileDirectly: true])
+                }
+            }
+
+
+        }
+
     }
 }
     
