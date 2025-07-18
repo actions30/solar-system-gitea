@@ -68,17 +68,20 @@ pipeline {
 
         stage('SonarQube') {
             steps {
-                sh 'echo $SONAR_SCANNER_HOME '
-                sh'''
-                $SONAR_SCANNER_HOME/bin/sonar-scanner \
-                -Dsonar.projectKey=jenkins-pipeline \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=http://172.183.97.211:9000 \
-                -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
-                -Dsonar.token=sqp_f16a88e410e8ffd60c881349728c80b02742ffe0
-                '''
+                timeout(time: 60, unit: 'SECONDS'){
+                    withSonarQubeEnv('SonarQube'){
+                        sh 'echo $SONAR_SCANNER_HOME '
+                        sh'''
+                            $SONAR_SCANNER_HOME/bin/sonar-scanner \
+                            -Dsonar.projectKey=jenkins-pipeline \
+                            -Dsonar.sources=. \
+                            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
+                        '''
+                    }
+                    waitForQualityGate abortPipeline: true
+               }    
 
-    }
-    }
+            }
+        }
     }
 }
