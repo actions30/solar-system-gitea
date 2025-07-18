@@ -125,6 +125,14 @@ pipeline {
 
         }
 
+        stage('Docker Push'){
+            steps{
+                withDockerRegistry(credentialId: 'DockerHub', url: ""){
+                    sh 'docker push dockerimage:$GIT_COMMIT'
+                }
+            }
+        }
+
     }
 }
     
