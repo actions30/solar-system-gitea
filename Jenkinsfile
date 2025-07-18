@@ -85,7 +85,7 @@ pipeline {
         stage('Dockerbuild'){
             steps{
                 sh 'printenv'                    //prints all the env variables accesed
-                sh 'docker build -t dockerimage:$GIT_COMMIT .'
+                sh ' docker build -t dockerimage:$GIT_COMMIT . '
             }
 
         }
