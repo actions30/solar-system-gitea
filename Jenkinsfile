@@ -110,15 +110,13 @@ pipeline {
             post{
                 always{
                     sh '''
-                    trivy convert \
                         trivy convert \
                             --format template \
-                            --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            --template @/usr/local/share/trivy/templates/html.tpl \
                             --output trivy-imageMEDIUM-results.html \
                             trivy-imageMEDIUM-results.json
+                        '''
 
-
-                    '''
 
                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'trivy-imageMEDIUM-results.html', reportName: 'trivy-imageMEDIUM-results.htmlreport', reportTitles: 'trivy-imageMEDIUM-results.html', useWrapperFileDirectly: true])
                 }
