@@ -111,10 +111,12 @@ pipeline {
                 always{
                     sh '''
                     trivy convert \
-                        --format template \
-                        --template "@/usr/local/share/trivy/templates/html.tpl" \
-                        --input trivy-imageMEDIUM-results.json \
-                        --output trivy-imageMEDIUM-results.html
+                        trivy convert \
+                            --format template \
+                            --template "@/usr/local/share/trivy/templates/html.tpl" \
+                            --output trivy-imageMEDIUM-results.html \
+                            trivy-imageMEDIUM-results.json
+
 
                     '''
 
