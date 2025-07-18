@@ -68,7 +68,7 @@ pipeline {
 
         stage('SonarQube') {
             steps {
-                timeout(time: 60, unit: 'SECONDS'){
+                
                     withSonarQubeEnv('SonarQube'){
                         sh 'echo $SONAR_SCANNER_HOME '
                         sh'''
@@ -83,4 +83,3 @@ pipeline {
             }
         }
     }
-}
