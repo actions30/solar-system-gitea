@@ -9,7 +9,7 @@ pipeline {
           SONAR_SCANNER_HOME = tool 'SonarQube';
     }
 
-    stages {
+    stages{
 
         stage('Installing Dependencies') {
             steps {
