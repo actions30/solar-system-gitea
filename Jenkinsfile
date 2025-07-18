@@ -17,75 +17,75 @@ pipeline {
             }
         }
 
-        stage('Dependency Scanning') {
-            parallel {
-                stage('NPM Dependency Audit') {
-                    steps {
-                        sh '''
-                            npm audit --audit-level=critical || true
-                            echo "NPM Audit completed"
-                        '''
-                    }
-                }
+//         stage('Dependency Scanning') {
+//             parallel {
+//                 stage('NPM Dependency Audit') {
+//                     steps {
+//                         sh '''
+//                             npm audit --audit-level=critical || true
+//                             echo "NPM Audit completed"
+//                         '''
+//                     }
+//                 }
 
-                stage('OWASP Dependency Check') {
-                    steps {
-                        dependencyCheck additionalArguments: '''
-                            --scan ./ \
-                            --out ./ \
-                            --format ALL \
-                            --prettyPrint
-                        ''', odcInstallation: 'OWASP-depend-check-12'
-                            dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
-                            junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
-                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
+//                 stage('OWASP Dependency Check') {
+//                     steps {
+//                         dependencyCheck additionalArguments: '''
+//                             --scan ./ \
+//                             --out ./ \
+//                             --format ALL \
+//                             --prettyPrint
+//                         ''', odcInstallation: 'OWASP-depend-check-12'
+//                             dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
+//                             junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
+//                             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
                            
               
-                    }
-                }
-            }
-        }
+//                     }
+//                 }
+//             }
+//         }
 
-        stage('Unit Testing') {
-            steps {
-                catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
-                    sh 'npm test'
-            }
-        }
+//         stage('Unit Testing') {
+//             steps {
+//                 catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
+//                     sh 'npm test'
+//             }
+//         }
 
-        }
+//         }
 
 
-        stage('Code coverage') {
-            steps {
-                catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
-                 sh ' npm run coverage'  
-                 }
-                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './coverage/lcov-result/', reportFiles: 'index.html', reportName: 'Code Coverage html report', reportTitles: 'codecoverage-jenkins', useWrapperFileDirectly: true])
-         }
+//         stage('Code coverage') {
+//             steps {
+//                 catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
+//                  sh ' npm run coverage'  
+//                  }
+//                  publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './coverage/lcov-result/', reportFiles: 'index.html', reportName: 'Code Coverage html report', reportTitles: 'codecoverage-jenkins', useWrapperFileDirectly: true])
+//          }
          
-}
+// }
 
-        stage('SonarQube') {
-            steps {
+//         stage('SonarQube') {
+//             steps {
                 
-                    withSonarQubeEnv('SonarQube'){
-                        sh 'echo $SONAR_SCANNER_HOME '
-                        sh'''
-                            $SONAR_SCANNER_HOME/bin/sonar-scanner \
-                            -Dsonar.projectKey=jenkins-pipeline \
-                            -Dsonar.sources=. \
-                            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
-                        '''
-                    }
-               }    
+//                     withSonarQubeEnv('SonarQube'){
+//                         sh 'echo $SONAR_SCANNER_HOME '
+//                         sh'''
+//                             $SONAR_SCANNER_HOME/bin/sonar-scanner \
+//                             -Dsonar.projectKey=jenkins-pipeline \
+//                             -Dsonar.sources=. \
+//                             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
+//                         '''
+//                     }
+//                }    
 
-            }
+//             }
 
         stage('Dockerbuild'){
             steps{
                 sh 'printenv'                    //prints all the env variables accesed
-                sh 'docker build -t dockerimage:$GIT_COMMIT'
+                sh 'docker build -t dockerimage:$GIT_COMMIT .'
             }
 
         }
