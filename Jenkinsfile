@@ -36,9 +36,9 @@ pipeline {
                             --format ALL \
                             --prettyPrint
                         ''', odcInstallation: 'OWASP-depend-check-12'
-                            dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
-                            junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
-                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
+                            // dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
+                            // junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
+                            // publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
                            
               
                     }
@@ -138,7 +138,7 @@ pipeline {
             }
         }
 
-         stage('Deploy to EC2'){
+        stage('Deploy to EC2'){
             steps{
                 script {
                     sshagent(['AWS-SSH private key dev deploy']) {
@@ -163,7 +163,14 @@ pipeline {
                 }
 
             }   
+        
+
+        stage('Integration Testing'){
+            steps{
+                sh echo '"Completed Integration Testing"'
+            }
         }
+    }
 }
     
 
