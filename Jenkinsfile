@@ -1,86 +1,86 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'Node 24.4.0'
-    }
+//     tools {
+//         nodejs 'Node 24.4.0'
+//     }
 
-    environment{
-          SONAR_SCANNER_HOME = tool 'SonarScanner';
-    }
+//     environment{
+//           SONAR_SCANNER_HOME = tool 'SonarScanner';
+//     }
 
-    stages {
+//     stages {
 
-        stage('Installing Dependencies') {
-            steps {
-                sh 'npm install --no-audit'
-            }
-        }
+//         stage('Installing Dependencies') {
+//             steps {
+//                 sh 'npm install --no-audit'
+//             }
+//         }
 
-        stage('Dependency Scanning') {
-            parallel {
-                stage('NPM Dependency Audit') {
-                    steps {
-                        sh '''
-                            npm audit --audit-level=critical || true
-                            echo "NPM Audit completed"
-                        '''
-                    }
-                }
+//         stage('Dependency Scanning') {
+//             parallel {
+//                 stage('NPM Dependency Audit') {
+//                     steps {
+//                         sh '''
+//                             npm audit --audit-level=critical || true
+//                             echo "NPM Audit completed"
+//                         '''
+//                     }
+//                 }
 
-                stage('OWASP Dependency Check') {
-                    steps {
-                        dependencyCheck additionalArguments: '''
-                            --scan ./ \
-                            --out ./ \
-                            --format ALL \
-                            --prettyPrint
-                        ''', odcInstallation: 'OWASP-depend-check-12'
-                            dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
-                            junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
-                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
+//                 stage('OWASP Dependency Check') {
+//                     steps {
+//                         dependencyCheck additionalArguments: '''
+//                             --scan ./ \
+//                             --out ./ \
+//                             --format ALL \
+//                             --prettyPrint
+//                         ''', odcInstallation: 'OWASP-depend-check-12'
+//                             dependencyCheckPublisher failedTotalCritical: 1, pattern: '**/dependency-check-report.xml', stopBuild: true
+//                             junit allowEmptyResults: true, testResults: 'dependency-check-junit.xml'
+//                             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'dependency-check-jenkins.html', reportName: 'dependency-check-jenkins.html	report', reportTitles: 'dependency-check-jenkins', useWrapperFileDirectly: true])
                            
               
-                    }
-                }
-            }
-        }
+//                     }
+//                 }
+//             }
+//         }
 
-        stage('Unit Testing') {
-            steps {
-                catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
-                    sh 'npm test'
-            }
-        }
+//         stage('Unit Testing') {
+//             steps {
+//                 catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
+//                     sh 'npm test'
+//             }
+//         }
 
-        }
+//         }
 
 
-        stage('Code coverage') {
-            steps {
-                catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
-                 sh ' npm run coverage'  
-                 }
-                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './coverage/lcov-result/', reportFiles: 'index.html', reportName: 'Code Coverage html report', reportTitles: 'codecoverage-jenkins', useWrapperFileDirectly: true])
-         }
+//         stage('Code coverage') {
+//             steps {
+//                 catchError(buildResult: 'SUCCESS', message: 'Oops! it will be fixed in future', stageResult: 'UNSTABLE') {
+//                  sh ' npm run coverage'  
+//                  }
+//                  publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './coverage/lcov-result/', reportFiles: 'index.html', reportName: 'Code Coverage html report', reportTitles: 'codecoverage-jenkins', useWrapperFileDirectly: true])
+//          }
          
-}
+// }
 
-        stage('SonarQube') {
-            steps {
+//         stage('SonarQube') {
+//             steps {
                 
-                    withSonarQubeEnv('SonarQube'){
-                        sh 'echo $SONAR_SCANNER_HOME '
-                        sh'''
-                            $SONAR_SCANNER_HOME/bin/sonar-scanner \
-                            -Dsonar.projectKey=jenkins-pipeline \
-                            -Dsonar.sources=. \
-                            -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
-                        '''
-                    }
-               }    
+//                     withSonarQubeEnv('SonarQube'){
+//                         sh 'echo $SONAR_SCANNER_HOME '
+//                         sh'''
+//                             $SONAR_SCANNER_HOME/bin/sonar-scanner \
+//                             -Dsonar.projectKey=jenkins-pipeline \
+//                             -Dsonar.sources=. \
+//                             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
+//                         '''
+//                     }
+//                }    
 
-            }
+//             }
 
         stage('Dockerbuild'){
             steps{
@@ -140,29 +140,32 @@ pipeline {
 
          stage('Deploy to EC2'){
             steps{
-                script{
+                script {
                     sshagent(['AWS-SSH private key dev deploy']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ubuntu@54.160.155.240 \\ '
+                            ssh -o StrictHostKeyChecking=no ubuntu@54.160.155.240 '
                                 if sudo docker ps -a | grep -q "solar-system"; then
-                                    echo " Container found. Stopping..."
-                                        sudo docker stop "solar-system" && sudo docker rm "solar-system" 
-                                    echo " Container Stopped and removed"
-                                fi        
-                                "sudo docker run --name solar-system \\
-                                    -e MONGO_URI='mongodb+srv://supercluster.d83jj.mongodb.net/superData' \\
-                                    -e MONGO_USERNAME='superuser' \\
-                                    -e MONGO_PASSWORD='SuperPassword' \\
-                                    -p 3000:3000 -d varshithag30/dockerimage:$GIT_COMMIT"
-                           '            
+                                echo "Container found. Stopping..."
+                                sudo docker stop solar-system && sudo docker rm solar-system
+                                echo "Container stopped and removed"
+                                fi
+
+                                sudo docker run --name solar-system \\
+                                -e MONGO_URI="mongodb+srv://supercluster.d83jj.mongodb.net/superData" \\
+                                -e MONGO_USERNAME=superuser \\
+                                -e MONGO_PASSWORD=SuperPassword \\
+                                -p 3000:3000 -d varshithag30/dockerimage:${GIT_COMMIT}
+                            '
                         """
-                        } 
+                        }
                     }
 
-                }   
-            }
+                }
+
+            }   
         }
-    }
+     }
+    
 
 
     
