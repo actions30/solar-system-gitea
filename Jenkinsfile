@@ -126,6 +126,9 @@ pipeline {
         }
 
         stage('Docker Push'){
+            when {
+                branch 'feature/*'
+                }
             steps{
                 withDockerRegistry(credentialsId:'DockerHub', url: ""){
                     sh 'docker tag dockerimage:$GIT_COMMIT varshithag30/dockerimage:$GIT_COMMIT'
@@ -135,8 +138,27 @@ pipeline {
             }
         }
 
+         stage('Deploy to EC2'){
+            steps{
+                    sshagent(['AWS-SSH private key dev deploy']) {
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no ubuntu@54.160.155.240 
+                            sudo docker run --name solar-system \
+                                    -e MONGO_URI= "mongodb+srv://supercluster.d83jj.mongodb.net/superData" \
+                                    -e MONGO_USERNAME= superuser \
+                                    -e MONGO_PASSWORD= SuperPassword \
+                                    -p 3000:3000 -d varshithag30/dockerimage:$GIT_COMMIT 
+
+                        '''            
+                    }
+                }
+            }
+        }
+
     }
-}
+
+    
+
     
 
 
