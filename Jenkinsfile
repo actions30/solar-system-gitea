@@ -167,7 +167,7 @@ pipeline {
 
         stage('Integration Testing'){
             steps{
-                sh echo '"Completed Integration Testing"'
+                sh 'echo "Completed Integration Testing"'
             }
         }
     }
