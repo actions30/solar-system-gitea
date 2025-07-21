@@ -143,7 +143,7 @@ pipeline {
                 script{
                     sshagent(['AWS-SSH private key dev deploy']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ubuntu@54.160.155.240 \\
+                            ssh -o StrictHostKeyChecking=no ubuntu@54.160.155.240 \\ '
                                 if sudo docker ps -a | grep -q "solar-system"; then
                                     echo " Container found. Stopping..."
                                         sudo docker stop "solar-system" && sudo docker rm "solar-system" 
@@ -154,6 +154,7 @@ pipeline {
                                     -e MONGO_USERNAME='superuser' \\
                                     -e MONGO_PASSWORD='SuperPassword' \\
                                     -p 3000:3000 -d varshithag30/dockerimage:$GIT_COMMIT"
+                           '            
                         """
                         } 
                     }
