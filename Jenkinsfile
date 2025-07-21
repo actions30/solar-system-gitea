@@ -9,7 +9,7 @@ pipeline {
 //           SONAR_SCANNER_HOME = tool 'SonarScanner';
 //     }
 
-//     stages {
+    stages {
 
 //         stage('Installing Dependencies') {
 //             steps {
