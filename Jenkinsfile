@@ -82,61 +82,61 @@ pipeline {
 
 //             }
 
-        stage('Dockerbuild'){
-            steps{
-                sh 'printenv'                    //prints all the env variables accesed
-                sh ' docker build -t dockerimage:$GIT_COMMIT . '
-            }
+        // stage('Dockerbuild'){
+        //     steps{
+        //         sh 'printenv'                    //prints all the env variables accesed
+        //         sh ' docker build -t dockerimage:$GIT_COMMIT . '
+        //     }
 
-        }
+        // }
 
-        stage('Trivy Vulnerability Scanner Docker image'){
-            steps{
-                sh '''
-                   trivy image dockerimage:$GIT_COMMIT \
-                        --severity LOW,MEDIUM,HIGH \
-                        --exit-code 0 \
-                        --quiet \
-                        --format json -o trivy-imageMEDIUM-results.json
+        // stage('Trivy Vulnerability Scanner Docker image'){
+        //     steps{
+        //         sh '''
+        //            trivy image dockerimage:$GIT_COMMIT \
+        //                 --severity LOW,MEDIUM,HIGH \
+        //                 --exit-code 0 \
+        //                 --quiet \
+        //                 --format json -o trivy-imageMEDIUM-results.json
 
-                    trivy image dockerimage:$GIT_COMMIT \
-                        --severity CRITICAL \
-                        --exit-code 1 \
-                        --quiet \
-                        --format json -o trivy-imageCRITICAL-results.json 
-                    '''       
-            }
+        //             trivy image dockerimage:$GIT_COMMIT \
+        //                 --severity CRITICAL \
+        //                 --exit-code 1 \
+        //                 --quiet \
+        //                 --format json -o trivy-imageCRITICAL-results.json 
+        //             '''       
+        //     }
 
-            post{
-                always{
-                    sh '''
-                        trivy convert \
-                            --format template \
-                            --template @/usr/local/share/trivy/templates/html.tpl \
-                            --output trivy-imageMEDIUM-results.html \
-                            trivy-imageMEDIUM-results.json
-                        '''
-
-
-                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'trivy-imageMEDIUM-results.html', reportName: 'trivy-imageMEDIUM-results.htmlreport', reportTitles: 'trivy-imageMEDIUM-results.html', useWrapperFileDirectly: true])
-                }
-            }
+        //     post{
+        //         always{
+        //             sh '''
+        //                 trivy convert \
+        //                     --format template \
+        //                     --template @/usr/local/share/trivy/templates/html.tpl \
+        //                     --output trivy-imageMEDIUM-results.html \
+        //                     trivy-imageMEDIUM-results.json
+        //                 '''
 
 
-        }
+        //             publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, icon: '', keepAll: true, reportDir: './', reportFiles: 'trivy-imageMEDIUM-results.html', reportName: 'trivy-imageMEDIUM-results.htmlreport', reportTitles: 'trivy-imageMEDIUM-results.html', useWrapperFileDirectly: true])
+        //         }
+        //     }
 
-        stage('Docker Push'){
-            when {
-                branch 'feature/*'
-                }
-            steps{
-                withDockerRegistry(credentialsId:'DockerHub', url: ""){
-                    sh 'docker tag dockerimage:$GIT_COMMIT varshithag30/dockerimage:$GIT_COMMIT'
-                    sh 'docker login'
-                    sh 'docker push varshithag30/dockerimage:$GIT_COMMIT'
-                }
-            }
-        }
+
+        // }
+
+        // stage('Docker Push'){
+        //     when {
+        //         branch 'feature/*'
+        //         }
+        //     steps{
+        //         withDockerRegistry(credentialsId:'DockerHub', url: ""){
+        //             sh 'docker tag dockerimage:$GIT_COMMIT varshithag30/dockerimage:$GIT_COMMIT'
+        //             sh 'docker login'
+        //             sh 'docker push varshithag30/dockerimage:$GIT_COMMIT'
+        //         }
+        //     }
+        // }
 
          stage('Deploy to EC2'){
             steps{
@@ -147,7 +147,7 @@ pipeline {
                                     -e MONGO_URI='mongodb+srv://supercluster.d83jj.mongodb.net/superData' \\
                                     -e MONGO_USERNAME='superuser' \\
                                     -e MONGO_PASSWORD='SuperPassword' \\
-                                    -p 3000:3000 -d varshithag30/dockerimage:$GIT_COMMIT"
+                                    -p 3000:3000 -d varshithag30/dockerimage:bbc37aee9e4c9e0aff521211ac56b25536a1647f"
                         """
                         } 
                 }
