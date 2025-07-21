@@ -127,7 +127,7 @@ pipeline {
 
         stage('Docker Push'){
             when {
-                branch 'feature/*'
+                branch 'feature'
                 }
             steps{
                 withDockerRegistry(credentialsId:'DockerHub', url: ""){
