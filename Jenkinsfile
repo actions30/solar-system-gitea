@@ -150,11 +150,11 @@ pipeline {
                                     -p 3000:3000 -d varshithag30/dockerimage:$GIT_COMMIT"
                         """
                         } 
-                    }
                 }
-            }
         }
+    }
 }
+
 
     
 
