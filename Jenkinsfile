@@ -128,6 +128,8 @@ pipeline {
         stage('Docker Push'){
             steps{
                 withDockerRegistry(credentialsId:'DockerHub', url: ""){
+                    sh 'docker tag dockerimage varshithag30/dockerimage'
+                    sh 'docker login'
                     sh 'docker push dockerimage:$GIT_COMMIT'
                 }
             }
